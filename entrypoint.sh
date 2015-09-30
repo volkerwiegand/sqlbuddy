@@ -30,6 +30,7 @@ EOF
 
 # If a certificate is available, add SSL / TLS
 if [[ -d /etc/apache2/tls ]] ; then
+	CertName=${CERT_NAME:-localhost}
 	a2enmod ssl
 	cat >/etc/apache2/sites-enabled/ssl_tls.conf <<-EOF
 		<VirtualHost *:443>
@@ -38,10 +39,11 @@ if [[ -d /etc/apache2/tls ]] ; then
 		   DocumentRoot $DocumentRoot
 		   ErrorLog     /dev/stderr
 		   CustomLog    /dev/stdout combined
-		   SSLEngine    on
-		   SSLCertificateFile	   /etc/apache2/tls/cert.pem
-		   SSLCertificateKeyFile   /etc/apache2/tls/cert.key
-		   SSLCertificateChainFile /etc/apache2/tls/cert.pem
+
+		   SSLEngine               on
+		   SSLCertificateFile	   /etc/apache2/tls/certs/${CertName}.pem
+		   SSLCertificateKeyFile   /etc/apache2/tls/private/${CertName}.key
+		   SSLCertificateChainFile /etc/apache2/tls/certs/${CertName}.pem
 		   <FilesMatch "\\.(cgi|shtml|phtml|php)\$">
 		      SSLOptions +StdEnvVars
 		   </FilesMatch>
