@@ -12,3 +12,4 @@ ADD ./entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 EXPOSE 80
+EXPOSE 443

@@ -6,4 +6,5 @@ This repository contains the Dockerfile to build an image for
 The image uses PHP 5.6 and is based upon the official docker PHP image
 ( https://hub.docker.com/_/php/ ).
 
+## This file is work-in-progress
 

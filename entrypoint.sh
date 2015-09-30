@@ -38,9 +38,16 @@ if [[ -d /etc/apache2/tls ]] ; then
 		   ErrorLog     \${APACHE_LOG_DIR}/error.log
 		   CustomLog    \${APACHE_LOG_DIR}/access.log combined
 		   SSLEngine    on
-		   SSLCertificateFile	   /etc/apache2/tls/cert.crt
+		   SSLCertificateFile	   /etc/apache2/tls/cert.pem
 		   SSLCertificateKeyFile   /etc/apache2/tls/cert.key
-		   SSLCertificateChainFile /etc/apache2/tls/chain.crt
+		   SSLCertificateChainFile /etc/apache2/tls/cert.pem
+		   <FilesMatch "\\.(cgi|shtml|phtml|php)\$">
+		      SSLOptions +StdEnvVars
+		   </FilesMatch>
+		   BrowserMatch "MSIE [2-6]" \\
+		      nokeepalive ssl-unclean-shutdown \\
+		      downgrade-1.0 force-response-1.0
+		   BrowserMatch "MSIE [17-9]" ssl-unclean-shutdown
 		</VirtualHost>
 	EOF
 fi
