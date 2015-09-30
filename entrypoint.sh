@@ -23,8 +23,8 @@ cat >/etc/apache2/sites-enabled/default.conf <<-EOF
 	   ServerName   $ServerName
 	   ServerAdmin  $ServerAdmin
 	   DocumentRoot $DocumentRoot
-	   ErrorLog     \${APACHE_LOG_DIR}/error.log
-	   CustomLog    \${APACHE_LOG_DIR}/access.log combined
+	   ErrorLog     /dev/stderr
+	   CustomLog    /dev/stdout combined
 	</VirtualHost>
 EOF
 
@@ -35,8 +35,8 @@ if [[ -d /etc/apache2/tls ]] ; then
 		   ServerName   $ServerName
 		   ServerAdmin  $ServerAdmin
 		   DocumentRoot $DocumentRoot
-		   ErrorLog     \${APACHE_LOG_DIR}/error.log
-		   CustomLog    \${APACHE_LOG_DIR}/access.log combined
+		   ErrorLog     /dev/stderr
+		   CustomLog    /dev/stdout combined
 		   SSLEngine    on
 		   SSLCertificateFile	   /etc/apache2/tls/cert.pem
 		   SSLCertificateKeyFile   /etc/apache2/tls/cert.key
