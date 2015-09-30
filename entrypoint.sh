@@ -50,6 +50,8 @@ if [[ -d /etc/apache2/tls ]] ; then
 		   BrowserMatch "MSIE [17-9]" ssl-unclean-shutdown
 		</VirtualHost>
 	EOF
+else
+	rm -f /etc/apache2/sites-enabled/ssl_tls.conf
 fi
 
 # Apache gets grumpy about PID files pre-existing
