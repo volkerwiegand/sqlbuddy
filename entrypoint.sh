@@ -23,22 +23,23 @@ cat >/etc/apache2/sites-enabled/default.conf <<-EOF
 	   ServerName   $ServerName
 	   ServerAdmin  $ServerAdmin
 	   DocumentRoot $DocumentRoot
-	   ErrorLog     /dev/stderr
-	   CustomLog    /dev/stdout combined
+	   ErrorLog     /proc/self/fd/2
+	   CustomLog    /proc/self/fd/1 combined
+	   HostnameLookups Off
 	</VirtualHost>
 EOF
 
 # If a certificate is available, add SSL / TLS
 if [[ -d /etc/apache2/tls ]] ; then
 	CertName=${CERT_NAME:-localhost}
-	a2enmod ssl
 	cat >/etc/apache2/sites-enabled/ssl_tls.conf <<-EOF
 		<VirtualHost *:443>
 		   ServerName   $ServerName
 		   ServerAdmin  $ServerAdmin
 		   DocumentRoot $DocumentRoot
-		   ErrorLog     /dev/stderr
-		   CustomLog    /dev/stdout combined
+		   ErrorLog     /proc/self/fd/2
+		   CustomLog    /proc/self/fd/1 combined
+		   HostnameLookups Off
 
 		   SSLEngine               on
 		   SSLCertificateFile	   /etc/apache2/tls/certs/${CertName}.pem
@@ -54,7 +55,6 @@ if [[ -d /etc/apache2/tls ]] ; then
 		</VirtualHost>
 	EOF
 else
-	a2dismod ssl
 	rm -f /etc/apache2/sites-enabled/ssl_tls.conf
 fi
 
