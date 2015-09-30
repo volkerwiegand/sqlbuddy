@@ -30,6 +30,7 @@ EOF
 
 # If a certificate is available, add SSL / TLS
 if [[ -d /etc/apache2/tls ]] ; then
+	a2enmod ssl
 	cat >/etc/apache2/sites-enabled/ssl_tls.conf <<-EOF
 		<VirtualHost *:443>
 		   ServerName   $ServerName
@@ -51,6 +52,7 @@ if [[ -d /etc/apache2/tls ]] ; then
 		</VirtualHost>
 	EOF
 else
+	a2dismod ssl
 	rm -f /etc/apache2/sites-enabled/ssl_tls.conf
 fi
 
