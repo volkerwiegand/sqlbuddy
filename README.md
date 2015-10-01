@@ -8,37 +8,41 @@ https://hub.docker.com/_/php/
 
 ### Features
 
-* Works over HTTP or HTTPS (using the host sertificate)
+* Works over HTTP or HTTPS (using the host certificate)
 
 * Does not require URL rewriting when called via sub-uri
 
 ### Example
 
-    docker run -e SERVER_NAME=www.example.com -e SERVER_ADMIN=webmaster@example.com SQLBUDDY_URI=/sqlbuddy -p 127.0.0.1:7443:443 -v /etc/pki/tls:/etc/apache2/tls:ro -e CERT_NAME=StartCom volkerwiegand/sqlbuddy:1.3.3
+    docker run -e SERVER_NAME=www.example.com -e SERVER_ADMIN=webmaster@example.com SQLBUDDY_URI=/admin/sqlbuddy -p 127.0.0.1:7443:443 -v /etc/pki/tls:/etc/apache2/tls:ro -e CERT_NAME=StartCom volkerwiegand/sqlbuddy:1.3.3
 
 This would expect a PEM certificate at /etc/pki/tls/certs/StartCom.pem
 (starting with the server certificate, followed by the certificate chain
-up to the root certificate), and the corresponding private key
-(without pass phrase) at /etc/pki/tls/private/StartCom.key.
+up to the root), and the corresponding private key
+at /etc/pki/tls/private/StartCom.key.
 
-The server and admin name will be set correctly. Also, the URIs coming
-out of SQL Buddy will already be formed corrctly.
+The Apache's server and admin name will be set correctly. Also, the URIs
+coming out of SQL Buddy will already be formed correctly.
 
 ### Environment variables
 
-** SERVER_NAME **
+*SERVER_NAME*
+
   Usually the name of the host running SQL Buddy. Used for setting up Apache.
 
-** SERVER_ADMIN **
+*SERVER_ADMIN*
+
   Also used for setting up Apache.
 
-** SQLBUDDY_URI **
+*SQLBUDDY_URI*
+
   This helps to call SQL Buddy as e.g. https://www.example.com/admin/sqlbuddy/
   See below for an Nginx configuration example.
 
-** CERT_NAME **
+*CERT_NAME*
+
   If this variable is set and if /etc/apache2/tls is a directory (usually
-  installed via bind mount from the host) then SQL Buddy can use the host's
+  included via bind mount) then SQL Buddy can use the host's
   SSL certificate and key. See above for the naming conventions and file
   locations. The layout is modelled after CentOS and other Enterprise Linux
   variants.
@@ -46,7 +50,7 @@ out of SQL Buddy will already be formed corrctly.
 ### Nginx example
 
 The following code snippet shows an Nginx location block to reverse proxy
-calls to https://www.example.com/admin/sqlbuddy/ to the docker container as
+calls entered as https://www.example.com/admin/sqlbuddy/ to the docker container as
 installed using the command line above.
 
     location ~ ^/admin/sqlbuddy(.*)$ {
