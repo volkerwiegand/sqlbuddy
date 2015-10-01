@@ -8,7 +8,6 @@ RUN git clone https://github.com/deliciousbrains/sqlbuddy.git /tmp/sqlbuddy_git 
 	&& mv -v /tmp/sqlbuddy_git/src/* /var/lib/sqlbuddy/ \
 	&& rm -rf /tmp/sqlbuddy_git /var/www/html/index.html
 
-ENV APACHE_LOG_DIR /var/log/apache2
 RUN a2enmod ssl
 
 ADD ./entrypoint.sh /entrypoint.sh

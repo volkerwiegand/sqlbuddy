@@ -1,5 +1,7 @@
 #!/bin/bash
-set -e
+# vim: set ts=8 tw=0 noet :
+
+set -e -o pipefail
 
 # Place SQL Buddy where the user wants to see it
 SqlBuddyUri=${SQLBUDDY_URI:-/}
@@ -61,5 +63,9 @@ fi
 # Apache gets grumpy about PID files pre-existing
 rm -f /var/run/apache2/apache2.pid
 
+# Setup environment to avoid warnings in the log
+[[ -r /etc/apache2/envvars ]] && . /etc/apache2/envvars
+
+# Hand over to apache as PID 1
 exec apache2 -DFOREGROUND
 
