@@ -60,11 +60,17 @@ else
 	rm -f /etc/apache2/sites-enabled/ssl_tls.conf
 fi
 
+# Setup environment to avoid warnings in the log
+export APACHE_RUN_USER=www-data
+export APACHE_RUN_GROUP=www-data
+export APACHE_PID_FILE=/var/run/apache2/apache2.pid
+export APACHE_RUN_DIR=/var/run/apache2
+export APACHE_LOCK_DIR=/var/lock/apache2
+export APACHE_LOG_DIR=/var/log/apache2
+export LANG=C
+
 # Apache gets grumpy about PID files pre-existing
 rm -f /var/run/apache2/apache2.pid
-
-# Setup environment to avoid warnings in the log
-[[ -r /etc/apache2/envvars ]] && . /etc/apache2/envvars
 
 # Hand over to apache as PID 1
 exec apache2 -DFOREGROUND
