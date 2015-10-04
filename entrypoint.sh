@@ -3,75 +3,72 @@
 
 set -e -o pipefail
 
-# Place SQL Buddy where the user wants to see it
+# Relocate the PHP code according to the given URI
 SqlBuddyUri=${SQLBUDDY_URI:-/}
 SqlBuddyUri=${SqlBuddyUri%/}
 SqlBuddyUri=${SqlBuddyUri#/}
 
+rm -rf /var/www/html
 if [[ -z "$SqlBuddyUri" ]] ; then
-	DocumentRoot="/var/lib/sqlbuddy"
+	ln -nfs /var/lib/sqlbuddy /var/www/html
 else
-	DocumentRoot="/var/www/html"
-	mkdir -p $DocumentRoot/${SqlBuddyUri%/*}
-	ln -nfs /var/lib/sqlbuddy $DocumentRoot/$SqlBuddyUri
+	mkdir -p /var/www/html/${SqlBuddyUri%/*}
+	ln -nfs /var/lib/sqlbuddy /var/www/html/$SqlBuddyUri
 fi
 
-# Setup the default virtual host
-ServerName=${SERVER_NAME:-localhost}
-ServerAdmin=${SERVER_ADMIN:-webmaster@localhost}
+cat >/etc/apache2/apache2.conf <<-EOF
+	Mutex file:/var/lock/apache2 default
+	PidFile /var/run/apache2/apache2.pid
+	Timeout 300
+	KeepAlive On
+	MaxKeepAliveRequests 100
+	KeepAliveTimeout 5
+	User www-data
+	Group www-data
+	ErrorLog /proc/self/fd/2
+	LogLevel ${LOG_LEVEL:-warn}
 
-cat >/etc/apache2/sites-enabled/default.conf <<-EOF
-	<VirtualHost *:80>
-	   ServerName   $ServerName
-	   ServerAdmin  $ServerAdmin
-	   DocumentRoot $DocumentRoot
-	   ErrorLog     /proc/self/fd/2
-	   CustomLog    /proc/self/fd/1 combined
-	   HostnameLookups Off
-	</VirtualHost>
+	IncludeOptional mods-enabled/*.load
+	IncludeOptional mods-enabled/*.conf
+
+	ServerName ${SERVER_NAME:-localhost}
+	ServerAdmin ${SERVER_ADMIN:-webmaster@localhost}
+	Listen 80
+	HostnameLookups Off
+
+	<Directory />
+		Options FollowSymLinks
+		AllowOverride None
+		Require all denied
+	</Directory>
+
+	<Directory /var/www/>
+		AllowOverride All
+		Require all granted
+	</Directory>
+
+	DocumentRoot /var/www/html
+
+	AccessFileName .htaccess
+	<FilesMatch "^\\.ht">
+		Require all denied
+	</FilesMatch>
+
+	LogFormat "%h %l %u %t \\"%r\\" %>s %O \\"%{Referer}i\\" \\"%{User-Agent}i\\"" combined
+	CustomLog /proc/self/fd/1 combined
+
+	<FilesMatch \\.php$>
+		SetHandler application/x-httpd-php
+	</FilesMatch>
+
+	DirectoryIndex disabled
+	DirectoryIndex index.php index.html
+
+	IncludeOptional conf-enabled/*.conf
 EOF
-
-# If a certificate is available, add SSL / TLS
-if [[ -d /etc/apache2/tls ]] ; then
-	CertName=${CERT_NAME:-localhost}
-	cat >/etc/apache2/sites-enabled/ssl_tls.conf <<-EOF
-		<VirtualHost *:443>
-		   ServerName   $ServerName
-		   ServerAdmin  $ServerAdmin
-		   DocumentRoot $DocumentRoot
-		   ErrorLog     /proc/self/fd/2
-		   CustomLog    /proc/self/fd/1 combined
-		   HostnameLookups Off
-
-		   SSLEngine               on
-		   SSLCertificateFile	   /etc/apache2/tls/certs/${CertName}.pem
-		   SSLCertificateKeyFile   /etc/apache2/tls/private/${CertName}.key
-		   SSLCertificateChainFile /etc/apache2/tls/certs/${CertName}.pem
-		   <FilesMatch "\\.(cgi|shtml|phtml|php)\$">
-		      SSLOptions +StdEnvVars
-		   </FilesMatch>
-		   BrowserMatch "MSIE [2-6]" \\
-		      nokeepalive ssl-unclean-shutdown \\
-		      downgrade-1.0 force-response-1.0
-		   BrowserMatch "MSIE [17-9]" ssl-unclean-shutdown
-		</VirtualHost>
-	EOF
-else
-	rm -f /etc/apache2/sites-enabled/ssl_tls.conf
-fi
-
-# Setup environment to avoid warnings in the log
-export APACHE_RUN_USER=www-data
-export APACHE_RUN_GROUP=www-data
-export APACHE_PID_FILE=/var/run/apache2/apache2.pid
-export APACHE_RUN_DIR=/var/run/apache2
-export APACHE_LOCK_DIR=/var/lock/apache2
-export APACHE_LOG_DIR=/var/log/apache2
-export LANG=C
 
 # Apache gets grumpy about PID files pre-existing
 rm -f /var/run/apache2/apache2.pid
 
 # Hand over to apache as PID 1
 exec apache2 -DFOREGROUND
-
