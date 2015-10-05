@@ -8,13 +8,8 @@ SqlBuddyUri=${SQLBUDDY_URI:-/}
 SqlBuddyUri=${SqlBuddyUri%/}
 SqlBuddyUri=${SqlBuddyUri#/}
 
-rm -rf /var/www/html
-if [[ -z "$SqlBuddyUri" ]] ; then
-	ln -nfs /var/lib/sqlbuddy /var/www/html
-else
-	mkdir -p /var/www/html/${SqlBuddyUri%/*}
-	ln -nfs /var/lib/sqlbuddy /var/www/html/$SqlBuddyUri
-fi
+[[ -n "$SqlBuddyUri" ]] && mkdir -p /var/www/html/$SqlBuddyUri
+tar -c -f - -C /var/lib/sqlbuddy . | tar -x -f - -C /var/www/html/$SqlBuddyUri
 
 cat >/etc/apache2/apache2.conf <<-EOF
 	Mutex file:/var/lock/apache2 default
@@ -66,6 +61,9 @@ cat >/etc/apache2/apache2.conf <<-EOF
 
 	IncludeOptional conf-enabled/*.conf
 EOF
+
+# Change ownership to enable online updates
+chown -R www-data /var/www/html
 
 # Apache gets grumpy about PID files pre-existing
 rm -f /var/run/apache2/apache2.pid
