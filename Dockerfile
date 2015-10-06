@@ -3,7 +3,7 @@ MAINTAINER Volker Wiegand <volker.wiegand@cvw.de>
 
 RUN apt-get update && apt-get install -y git vim-tiny && rm -rf /var/lib/apt/lists/*
 
-RUN docker-php-ext-install mbstring mysqli
+RUN docker-php-ext-install gd intl mbstring mcrypt mysql pdo_mysql
 
 RUN git clone https://github.com/deliciousbrains/sqlbuddy.git /tmp/sqlbuddy_git \
 	&& mkdir /var/lib/sqlbuddy \
