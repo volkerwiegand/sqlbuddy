@@ -3,6 +3,7 @@ MAINTAINER Volker Wiegand <volker.wiegand@cvw.de>
 
 RUN apt-get update && apt-get install -y \
 	git \
+	libmcrypt4 \
 	libmcrypt-dev \
 	vim-tiny \
 	&& rm -rf /var/lib/apt/lists/*
