@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
 	vim-tiny \
 	&& rm -rf /var/lib/apt/lists/*
 
-RUN docker-php-ext-install intl mbstring mcrypt mysqli pdo pdo_mysql
+RUN docker-php-ext-install intl mbstring mcrypt mysqli
 
 RUN git clone https://github.com/deliciousbrains/sqlbuddy.git /tmp/sqlbuddy_git \
 	&& mkdir /var/lib/sqlbuddy \
