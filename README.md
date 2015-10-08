@@ -12,7 +12,7 @@ https://hub.docker.com/_/php/
 
 ### Example
 
-    docker run -e SERVER_NAME=www.example.com -e SERVER_ADMIN=webmaster@example.com SQLBUDDY_URI=/admin/sqlbuddy -e LOG_LEVEL=debug -p 127.0.0.1:8010:80 volkerwiegand/sqlbuddy:1.3.3
+    docker run -e SERVER_NAME=www.example.com -e SERVER_ADMIN=webmaster@example.com -e SQLBUDDY_URI=/admin/sqlbuddy -e LOG_LEVEL=debug -p 127.0.0.1:8010:80 volkerwiegand/sqlbuddy:1.3.3
 
 ### Environment variables
 
@@ -47,3 +47,9 @@ installed using the command line above.
       proxy_pass https://127.0.0.1:8010;
     }
  
+### License
+
+The MIT License (MIT)
+
+Copyright (c) 2015 Volker Wiegand
+
