@@ -4,12 +4,12 @@
 set -e -o pipefail
 
 # Relocate the PHP code according to the given URI
-MantisBTUri=${MANTISBT_URI:-/}
-MantisBTUri=${MantisBTUri%/}
-MantisBTUri=${MantisBTUri#/}
+SqlBuddyUri=${SQLBUDDY_URI:-/}
+SqlBuddyUri=${SqlBuddyUri%/}
+SqlBuddyUri=${SqlBuddyUri#/}
 
-[[ -n "$MantisBTUri" ]] && mkdir -p /var/www/html/$MantisBTUri
-tar -c -f - -C /var/lib/mantisbt . | tar -x -f - -C /var/www/html/$MantisBTUri
+[[ -n "$SqlBuddyUri" ]] && mkdir -p /var/www/html/$SqlBuddyUri
+tar -c -f - -C /var/lib/sqlbuddy . | tar -x -f - -C /var/www/html/$SqlBuddyUri
 
 cat >/etc/apache2/apache2.conf <<-EOF
 	Mutex file:/var/lock/apache2 default
